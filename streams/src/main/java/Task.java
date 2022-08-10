@@ -1,7 +1,5 @@
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 
@@ -64,6 +62,7 @@ public class Task {
         System.out.println("----------");
 
 //          Create a list of States and print all the cities.
+
         List<State> states = Arrays.asList(
                 new State("Berlin"),
                 new State("Baden-Württemberg"),
@@ -132,25 +131,26 @@ public class Task {
         TransactionData.getAll().stream()
                 .map(Transaction::getTrader)
                 .distinct()
-                .filter(trader -> trader.getCity()=="Cambridge")
+                .filter(trader -> Objects.equals(trader.getCity(), "Cambridge"))
                 .sorted(comparing(Trader::getName))
                 .forEach(System.out::println);
         System.out.println("*************************");
 
 //        Return a string of all traders’ names sorted alphabetically.
 
-        TransactionData.getAll().stream()
-                .map(Transaction::getTrader)
-                .sorted(comparing(Trader::getName))
-                .map(Trader::getName)
+        String str = TransactionData.getAll().stream()
+                .map(trans -> trans.getTrader().getName())
                 .distinct()
-                .forEach(System.out::println);
+                .sorted()
+                .reduce("", (name1, name2) -> name1 + name2+ " ");
+        System.out.println(str);
+
 
         System.out.println("*************************");
 
 //        Are any traders based in Milan?
 
-        boolean anyMatch = TransactionData.getAll().stream().anyMatch(data -> data.getTrader().getCity() == "Milan");
+        boolean anyMatch = TransactionData.getAll().stream().anyMatch(data -> Objects.equals(data.getTrader().getCity(), "Milan"));
         System.out.println(anyMatch);
 
         System.out.println("*************************");
@@ -158,7 +158,7 @@ public class Task {
 //        Print the values of all transactions from the traders living in Cambridge.
 
         TransactionData.getAll().stream()
-                .filter(data->data.getTrader().getCity()=="Cambridge")
+                .filter(data-> Objects.equals(data.getTrader().getCity(), "Cambridge"))
                 .map(Transaction::getValue)
                 .forEach(System.out::println);
 
@@ -172,13 +172,29 @@ public class Task {
         System.out.println(maxValue);
 
 //         Find the transaction with the smallest value.
-        Optional<Integer> minValue = TransactionData.getAll().stream()
-                .map(Transaction::getValue)
-                .reduce(Integer::min);
-        System.out.println(minValue);
+        Optional<Transaction> minValue = TransactionData.getAll().stream()
+                .reduce((t1,t2)-> t1.getValue()<t2.getValue() ? t1 : t2);
+
+        System.out.println(minValue.get());
+
+        Optional<Transaction> minValue2 = TransactionData.getAll().stream()
+                .min(comparing(Transaction::getValue));
+        System.out.println(minValue2.get());
 
 
-        // todo: generate the first 20 elements of the series of Fibonacci tuples using iterate method.
+        //  generate the first 20 elements of the series of Fibonacci tuples using iterate method.
+
+        Stream.iterate(new int[]{0, 1}, t -> new int[]{t[1], t[0] + t[1]})
+                .limit(8)
+                .forEach(t -> System.out.println("(" + t[0] + "," + t[1] + ")"));
+
+        System.out.println("*********");
+
+        Stream.iterate(new int[]{0,1}, t -> new int[]{t[1],t[0]+t[1]})
+                .limit(8)
+                .map(t -> t[0])
+                .forEach(System.out::println);
+
 
     }
 }
