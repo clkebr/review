@@ -22,7 +22,8 @@ public class Reducing {
         System.out.println("Max:" + max.get());
         System.out.println("Sum:" + sum.get());
 
-        //Task
+        //Task: count the number of dishes in a stream using the map and reduce methods?
+
         int dishCount = DishData.getAll().stream().map(d -> 1).reduce(0,(a,b) -> a+b);
         System.out.println(dishCount);
 
